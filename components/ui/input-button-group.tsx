@@ -3,13 +3,19 @@ import { ButtonGroup } from "@/components/ui/button-group"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-export function InputButtonGroup() {
+interface groupType{
+    label: string,
+    buttonText: string,
+    placeholder: string
+}
+
+export function InputButtonGroup({label, buttonText, placeholder}: groupType) {
     return (
         <Field>
-        <FieldLabel htmlFor="input-button-group">Search</FieldLabel>
+        <FieldLabel htmlFor="input-button-group">{label}</FieldLabel>
         <ButtonGroup>
-            <Input id="input-button-group" placeholder="Type to search..." />
-            <Button variant="outline">Search</Button>
+            <Input id="input-button-group" placeholder={placeholder} />
+            <Button variant="outline">{buttonText}</Button>
         </ButtonGroup>
         </Field>
     )
