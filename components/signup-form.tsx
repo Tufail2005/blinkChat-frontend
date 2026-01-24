@@ -17,7 +17,10 @@ import { Input } from "@/components/ui/input";
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   return (
     <Card {...props}>
-      <CardHeader>
+      <div className="flex justify-center pt-2">
+        <img src="/logo.png" alt="logo" className="h-12 w-auto"/>
+      </div>
+        <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
           Enter your information below to create your account
@@ -30,19 +33,6 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input id="name" type="text" placeholder="John Doe" required />
             </Field>
-            {/* <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-              <FieldDescription>
-                We&apos;ll use this to contact you. We will not share your email
-                with anyone else.
-              </FieldDescription>
-            </Field> */}
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input id="password" type="password" required />
@@ -59,10 +49,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
-                <Button variant="outline" type="button">
-                  Sign up with Google
-                </Button>
+                <Button type="submit" className="border-1 bg-black text-white">Create Account</Button>
                 <FieldDescription className="px-6 text-center">
                   Already have an account? <a href="signin">Sign in</a>
                 </FieldDescription>
