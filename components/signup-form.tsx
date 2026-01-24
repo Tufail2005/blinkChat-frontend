@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,8 +57,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         }
       );
 
-      // TODO: redirect to dashboard or login
-      alert("Account created successfully!");
+      // redirect to message
+      router.push("/message");
     } catch (err: any) {
       console.error(err);
       setError(err?.response?.data?.message || "Failed to create account.");
