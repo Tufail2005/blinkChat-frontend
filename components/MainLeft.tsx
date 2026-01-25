@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LandingHero } from "./LandingHero";
 import { EmailForm } from "./Email-form";
-import { OTPForm } from "./Otp-form";
+import { OTPForm } from "./otp-form";
 
 type Step = "landing" | "email" | "otp";
 
