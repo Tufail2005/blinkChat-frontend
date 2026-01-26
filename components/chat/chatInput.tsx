@@ -51,12 +51,12 @@ export function ChatInput() {
               />
             </button>
 
-            <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            {/* <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
               <Paperclip className="h-5 w-5" />
             </button>
             <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
               <Mic className="h-5 w-5" />
-            </button>
+            </button> */}
           </div>
         </div>
         <Button className="h-12 px-8 bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 shadow-sm font-medium">

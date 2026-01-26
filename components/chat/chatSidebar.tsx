@@ -7,9 +7,44 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { users } from "./chatData";
+// import { users } from "./chatData";
+import axios from "axios";
+import { useState, useEffect } from "react";
+
+type Room = {
+  id: string;
+  name: string;
+  photo: string | null;
+  lastMessage: string | null;
+  lastMessageTime: string | null;
+};
 
 export function ChatSidebar() {
+  const [rooms, setRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/room/joined", {
+          withCredentials: true,
+        });
+        setRooms(res.data);
+      } catch (error) {
+        console.error("Error fetching room info:", error);
+      }
+    };
+
+    fetchRoom();
+  }, []);
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
   return (
     <div className="w-[320px] flex flex-col border-r bg-white h-full min-h-0">
       {/* Header*/}
@@ -39,9 +74,9 @@ export function ChatSidebar() {
       <div className="flex-1 min-h-0 overflow-hidden">
         <ScrollArea className="h-full">
           <div className="flex flex-col pb-2">
-            {users.map((user) => (
+            {rooms.map((room) => (
               <div
-                key={user.id}
+                key={room.id}
                 className={cn(
                   "flex items-start gap-3 p-4 px-5 cursor-pointer transition-colors hover:bg-gray-50"
                 )}
@@ -49,37 +84,39 @@ export function ChatSidebar() {
                 <div className="relative">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={`https://i.pravatar.cc/150?u=${user.id}`}
+                      src={`https://i.pravatar.cc/150?u=${room.id}`}
                     />
-                    <AvatarFallback>{user.name[0]}</AvatarFallback>
+                    <AvatarFallback>{getInitials(room.name)}</AvatarFallback>
                   </Avatar>
-                  {user.status === "online" && (
-                    <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white" />
-                  )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="font-semibold text-sm text-gray-900 truncate">
-                      {user.name}
+                      {room.name}
                     </span>
                     <span className="text-xs text-gray-400 font-medium">
-                      {user.time}
+                      {room.lastMessageTime
+                        ? new Date(room.lastMessageTime).toLocaleTimeString(
+                            [],
+                            { hour: "numeric", minute: "2-digit" }
+                          )
+                        : ""}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1.5 overflow-hidden">
-                      <CheckCheck className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                      {/* <CheckCheck className="h-3.5 w-3.5 text-green-500 shrink-0" /> */}
                       <p className="text-sm text-gray-500 truncate max-w-35">
-                        {user.lastMsg}
+                        {room.lastMessage}
                       </p>
                     </div>
-                    {user.unread > 0 && (
+                    {/* {user.unread > 0 && (
                       <Badge className="h-5 w-5 rounded-full p-0 flex items-center justify-center bg-green-500 hover:bg-green-600 text-[10px]">
                         {user.unread}
                       </Badge>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>
