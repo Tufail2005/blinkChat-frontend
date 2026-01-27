@@ -25,6 +25,7 @@ export function ChatHeader() {
   
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchHeaderData = async () => {
@@ -39,8 +40,12 @@ export function ChatHeader() {
           withCredentials: true,
         });
         setRoom(res.data);
-      } catch (error) {
+      } catch (error:any) {
         console.error("Failed to fetch room info");
+        if (error.response && error.response.status === 404) {
+              router.push("/message"); // Redirect to main chat list
+              router.refresh();
+        }
       } finally {
         setLoading(false);
       }
@@ -78,7 +83,7 @@ export function ChatHeader() {
       <header className="flex items-center justify-between px-6 py-4 border-b bg-white h-[73px]">
         
         <div 
-            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-discrete"
             onClick={() => setIsInfoOpen(true)}
         >
           <div className="relative">
@@ -102,7 +107,13 @@ export function ChatHeader() {
         </div>
 
         <div className="flex items-center gap-1">
-          <DropdownMenu>
+          {menuOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+              aria-hidden="true"
+            />
+          )}
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-gray-400">
                 <MoreHorizontal className="h-5 w-5" />

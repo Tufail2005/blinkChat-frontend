@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 import { useState } from "react";
 import axios from "axios";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +29,7 @@ export function CreateRoomDialog({
 }: CreateRoomDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-
+  const router = useRouter()
   // Destructure location hook
   const {
     location,
@@ -56,7 +57,7 @@ export function CreateRoomDialog({
       await axios.post("http://localhost:4000/api/room/create", payload, {
         withCredentials: true,
       });
-
+      router.refresh();
       setSubmitting(false);
       onOpenChange(false);
       setName("");

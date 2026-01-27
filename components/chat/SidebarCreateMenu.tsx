@@ -29,6 +29,7 @@ export function SidebarCreateMenu({ children }: SidebarCreateMenuProps) {
         open={showCreateRoom}
         onOpenChange={setShowCreateRoom}
       />
+      
       <NearbyRoomDialog
         open={showNearbyRoom}
         onOpenChange={setShowNearbyRoom}
