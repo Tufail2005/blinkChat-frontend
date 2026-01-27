@@ -1,14 +1,39 @@
-import { ChatSidebar } from "@/components/chat/chatSidebar";
-import { ChatWindow } from "@/components/chat/chatWindow";
+"use client";
 
-export default function () {
-  return (
-    <div className="flex h-screen w-full p-4 overflow-hidden">
-      <div className="flex h-[calc(100vh-2rem)] w-full  bg-white shadow-xl overflow-hidden">
-        <ChatSidebar />
+import { ChatSidebar } from "@/components/chat/chatSidebar"; 
+import Image from "next/image";
 
-        <ChatWindow />
-      </div>
-    </div>
-  );
+export default function MessageHome() {
+    return (
+        <div className="flex h-screen w-full p-0 md:p-4 overflow-hidden bg-gray-100 md:bg-transparent">
+        <div className="flex h-full md:h-[calc(100vh-2rem)] w-full bg-white md:shadow-xl overflow-hidden md:rounded-xl">
+
+            <div className="w-full md:w-auto h-full flex flex-col md:border-r">
+            <ChatSidebar />
+            </div>
+
+            <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-gray-50/50">
+            <div className="flex flex-col items-center justify-center text-center p-8 opacity-80 animate-in fade-in duration-500">
+                <div className="relative h-72 w-72 mb-6 opacity-90">
+                <Image 
+                    src="/not-selected-chat.svg" 
+                    alt="No chat selected"
+                    fill
+                    className="object-contain"
+                    priority
+                />
+                </div>
+                
+                <h3 className="text-2xl font-semibold text-gray-800">
+                Welcome to BlinkChat
+                </h3>
+                <p className="text-gray-500 max-w-sm mt-3 text-sm leading-relaxed">
+                Select a conversation from the sidebar to start messaging, or create a new room to hang out with friends.
+                </p>
+            </div>
+            </div>
+
+        </div>
+        </div>
+    );
 }

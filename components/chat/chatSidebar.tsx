@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { SidebarCreateMenu } from "./SidebarCreateMenu";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 type Room = {
   id: string;
@@ -77,8 +78,8 @@ export function ChatSidebar() {
         <ScrollArea className="h-full">
           <div className="flex flex-col pb-2">
             {rooms.map((room) => (
-              <div
-                key={room.id}
+              <Link key={room.id} href={`/${room.id}/messages`}>
+                <div
                 className={cn(
                   "flex items-start gap-3 p-4 px-5 cursor-pointer transition-colors hover:bg-gray-50"
                 )}
@@ -122,6 +123,7 @@ export function ChatSidebar() {
                   </div>
                 </div>
               </div>
+              </Link>
             ))}
           </div>
         </ScrollArea>
@@ -129,3 +131,4 @@ export function ChatSidebar() {
     </div>
   );
 }
+
