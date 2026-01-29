@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import AvatarUpload from "@/components/AvatarUpload";
 import {
   Dialog,
   DialogContent,
@@ -31,8 +32,9 @@ export function CreateRoomDialog({
 }: CreateRoomDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const router = useRouter()
-  // Destructure location hook
+  const [roomPhoto, setRoomPhoto] = useState("");
+  const router = useRouter();
+
   const {
     location,
     error: locationError, // This now contains the specific error message
@@ -54,6 +56,7 @@ export function CreateRoomDialog({
         description,
         latitude: location.lat,
         longitude: location.lng,
+        photo: roomPhoto,
       };
 
       await axios.post("http://localhost:4000/api/room/create", payload, {
@@ -86,6 +89,15 @@ export function CreateRoomDialog({
             Create a location-based room for people nearby to join.
           </DialogDescription>
         </DialogHeader>
+
+        {/* AVATAR UPLOAD  */}
+        <div className="flex justify-center py-2">
+          <AvatarUpload
+            folderPath="/rooms/icons"
+            onUploadComplete={(url) => setRoomPhoto(url)}
+            defaultImage="/default-room-icon.png"
+          />
+        </div>
 
         <div className="grid gap-4 py-4">
           {/* Room Name */}

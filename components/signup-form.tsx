@@ -20,10 +20,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
+import AvatarUpload from "@/components/AvatarUpload";
+
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -51,6 +54,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         {
           userName,
           password,
+          photo: photoUrl,
         },
         {
           withCredentials: true, //sends verification cookie
@@ -70,9 +74,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   return (
     <Card {...props}>
       <div className="flex justify-center pt-2">
-        <img src="/logo.png" alt="logo" className="h-12 w-auto"/>
+        <img src="/logo.png" alt="logo" className="h-12 w-auto" />
       </div>
-        <CardHeader>
+      <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
           Enter your information below to create your account
@@ -80,6 +84,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       </CardHeader>
 
       <CardContent>
+        {/*  AVATAR UPLOAD */}
+        <AvatarUpload
+          folderPath="/users/avatars"
+          onUploadComplete={(url) => setPhotoUrl(url)}
+        />
         <form onSubmit={handleSubmit}>
           <FieldGroup className="space-y-4">
             <Field>
