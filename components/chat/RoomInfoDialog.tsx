@@ -2,20 +2,20 @@
 
 import { useEffect, useState, useRef } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Pencil, Camera, Users, LogOut, Check, X } from "lucide-react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    } from "@/components/ui/dialog";
+    import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+    import { Button } from "@/components/ui/button";
+    import { Input } from "@/components/ui/input";
+    import { ScrollArea } from "@/components/ui/scroll-area";
+    import { Pencil, Camera, Users, LogOut, Check, X } from "lucide-react";
+    import axios from "axios";
+    import { useRouter } from "next/navigation";
 
-interface RoomInfoDialogProps {
+    interface RoomInfoDialogProps {
     roomId: string;
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -23,8 +23,15 @@ interface RoomInfoDialogProps {
 
     export function RoomInfoDialog({ roomId, isOpen, onOpenChange }: RoomInfoDialogProps) {
     const [roomDetails, setRoomDetails] = useState<any>(null);
+    
+    // State for editing Name
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [newName, setNewName] = useState("");
+
+    // State for editing Description
     const [isEditingDesc, setIsEditingDesc] = useState(false);
     const [newDescription, setNewDescription] = useState("");
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -35,24 +42,43 @@ interface RoomInfoDialogProps {
             .get(`http://localhost:4000/api/room/${roomId}`, { withCredentials: true })
             .then((res) => {
             setRoomDetails(res.data);
+            setNewName(res.data.name || "");
             setNewDescription(res.data.description || "");
             })
             .catch((err) => console.error("Failed to load room details", err));
         }
     }, [isOpen, roomId]);
 
-    // 2. Handle Description Save
-    const handleSaveDescription = async () => {
+    // 2. Generic Update Function (Handles both Name and Description)
+    const handleUpdateRoom = async (field: "name" | "description") => {
+        const value = field === "name" ? newName : newDescription;
+        
+        // Don't update if empty (optional check)
+        if (!value.trim()) return;
+
         try {
+        // Sending strictly the field we want to update
+        const payload = { [field]: value }; 
+
         await axios.put(
-            `http://localhost:4000/api/room/${roomId}/update`, // Ensure this route exists
-            { description: newDescription },
+            `http://localhost:4000/api/room/${roomId}/update`, 
+            payload,
             { withCredentials: true }
         );
-        setRoomDetails({ ...roomDetails, description: newDescription });
-        setIsEditingDesc(false);
-        } catch (error) {
-        console.error("Failed to update description");
+
+        // Update local state to reflect changes immediately (Optimistic Update)
+        setRoomDetails((prev: any) => ({ ...prev, [field]: value }));
+        
+        // Close the specific edit mode
+        if (field === "name") setIsEditingName(false);
+        if (field === "description") setIsEditingDesc(false);
+        
+        } catch (error: any) {
+        console.error(`❌ Failed to update ${field}:`, error);
+        if (error.response) {
+            console.error("Server Message:", error.response.data);
+            alert(`Error: ${error.response.data.message || "Update failed"}`);
+        }
         }
     };
 
@@ -64,24 +90,20 @@ interface RoomInfoDialogProps {
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        
-        // Here you would upload the file to S3/Cloudinary, get a URL, 
-        // and then send that URL to your backend. 
-        // For now, we'll just log it.
         console.log("File selected:", file);
         alert("Image upload logic goes here!");
     };
 
     // 4. Handle Exit Group
     const handleExitGroup = async () => {
-        if(!confirm("Are you sure you want to leave this group?")) return;
-        
+        if (!confirm("Are you sure you want to leave this group?")) return;
+
         try {
         await axios.post(`http://localhost:4000/api/room/${roomId}/leave`, {}, { withCredentials: true });
-        router.push("/message"); // Redirect to home
+        router.push("/message");
         onOpenChange(false);
         } catch (error) {
-        console.error("Failed to leave group");
+        console.error("Failed to leave group", error);
         }
     };
 
@@ -103,22 +125,47 @@ interface RoomInfoDialogProps {
                     {roomDetails.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
                 </Avatar>
-                
-                {/* Hover Overlay for Changing DP */}
                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Camera className="h-8 w-8 text-white" />
                 </div>
                 <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleFileChange} 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/*"
+                onChange={handleFileChange} 
                 />
             </div>
 
-            <h2 className="mt-4 text-xl font-semibold text-gray-900">{roomDetails.name}</h2>
-            <p className="text-sm text-gray-500">
+            {/* --- NAME SECTION (Updated) --- */}
+            <div className="mt-4 w-full flex justify-center items-center gap-2">
+                {isEditingName ? (
+                <div className="flex items-center gap-2 w-full max-w-[250px]">
+                    <Input 
+                    value={newName} 
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="h-8 text-center font-semibold text-lg"
+                    autoFocus
+                    />
+                    <Button size="sm" onClick={() => handleUpdateRoom("name")} className="h-8 w-8 p-0 bg-green-500 hover:bg-green-600">
+                        <Check className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setIsEditingName(false)} className="h-8 w-8 p-0">
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+                ) : (
+                <div className="flex items-center gap-2 group">
+                    <h2 className="text-xl font-semibold text-gray-900">{roomDetails.name}</h2>
+                    <Pencil 
+                        className="h-4 w-4 text-gray-400 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity hover:text-blue-600" 
+                        onClick={() => setIsEditingName(true)}
+                    />
+                </div>
+                )}
+            </div>
+
+            <p className="text-sm text-gray-500 mt-1">
                 Group · {roomDetails._count?.members || 0} members
             </p>
             </div>
@@ -143,8 +190,9 @@ interface RoomInfoDialogProps {
                         value={newDescription} 
                         onChange={(e) => setNewDescription(e.target.value)}
                         className="h-8 text-sm"
+                        autoFocus
                     />
-                    <Button size="sm" onClick={handleSaveDescription} className="h-8 w-8 p-0 bg-green-500 hover:bg-green-600">
+                    <Button size="sm" onClick={() => handleUpdateRoom("description")} className="h-8 w-8 p-0 bg-green-500 hover:bg-green-600">
                         <Check className="h-4 w-4" />
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIsEditingDesc(false)} className="h-8 w-8 p-0">
@@ -162,40 +210,38 @@ interface RoomInfoDialogProps {
 
                 {/* --- MEMBERS SECTION --- */}
                 <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Users className="h-4 w-4" />
-                        <span>{roomDetails.members?.length} Members</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Users className="h-4 w-4" />
+                    <span>{roomDetails.members?.length} Members</span>
+                </div>
+                
+                <div className="space-y-3">
+                    {roomDetails.members?.map((member: any) => (
+                    <div key={member.id} className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                        <AvatarImage src={`https://i.pravatar.cc/150?u=${member.id}`} />
+                        <AvatarFallback>{member.userName?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                            {member.userName || "Unknown User"}
+                        </p>
+                        </div>
                     </div>
-                    
-                    <div className="space-y-3">
-                        {roomDetails.members?.map((member: any) => (
-                            <div key={member.id} className="flex items-center gap-3">
-                                <Avatar className="h-9 w-9">
-                                    <AvatarImage src={`https://i.pravatar.cc/150?u=${member.id}`} />
-                                    <AvatarFallback>{member.userName?.slice(0,2)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                        {member.userName || "Unknown User"}
-                                    </p>
-                                    <p className="text-xs text-gray-400 truncate">{member.email}</p>
-                                </div>
-                                {/* If current user is owner, show Remove button here */}
-                            </div>
-                        ))}
-                    </div>
+                    ))}
+                </div>
                 </div>
 
                 <div className="h-px bg-gray-100" />
 
                 {/* --- EXIT BUTTON --- */}
                 <Button 
-                    variant="destructive" 
-                    className="w-full gap-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
-                    onClick={handleExitGroup}
+                variant="destructive" 
+                className="w-full gap-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
+                onClick={handleExitGroup}
                 >
-                    <LogOut className="h-4 w-4" />
-                    Exit Room
+                <LogOut className="h-4 w-4" />
+                Exit Room
                 </Button>
 
             </div>
