@@ -21,11 +21,13 @@ import { useLocation } from "@/hooks/useLocation"; // Ensure path matches your f
 interface CreateRoomDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function CreateRoomDialog({
   open,
   onOpenChange,
+  onSuccess,
 }: CreateRoomDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -62,6 +64,10 @@ export function CreateRoomDialog({
       onOpenChange(false);
       setName("");
       setDescription("");
+
+      if (onSuccess) {
+        onSuccess();
+      }
 
       alert("Room created successfully!");
     } catch (error) {

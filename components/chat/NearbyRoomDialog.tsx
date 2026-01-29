@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 interface NearbyRoomDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onJoinSuccess?: () => void;
 }
 type NearbyRoom = {
   id: string;
@@ -30,6 +31,7 @@ type NearbyRoom = {
 export function NearbyRoomDialog({
   open,
   onOpenChange,
+  onJoinSuccess,
 }: NearbyRoomDialogProps) {
   const {
     location,
@@ -73,6 +75,10 @@ export function NearbyRoomDialog({
 
       // Close dialog and maybe redirect to the room
       onOpenChange(false);
+
+      if (onJoinSuccess) {
+        onJoinSuccess();
+      }
       alert("Joined room successfully!");
     } catch (error) {
       alert("Failed to join room");
@@ -83,7 +89,7 @@ export function NearbyRoomDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] h-[600px] flex flex-col">
+      <DialogContent className="sm:max-w-125 h-150 flex flex-col">
         <DialogHeader>
           <DialogTitle>Explore Nearby Rooms</DialogTitle>
           <DialogDescription>
