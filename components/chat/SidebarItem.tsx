@@ -41,7 +41,7 @@ export const SidebarItem = memo(
               <AvatarImage
                 src={
                   room.photo
-                    ? `${room.photo}?tr=w-200,h-200,fo-face`
+                    ? `${room.photo}?tr=w-400,h-400,fo-auto`
                     : undefined
                 }
                 alt={room.name}
