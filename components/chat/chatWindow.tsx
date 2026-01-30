@@ -4,17 +4,21 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { ChatHeader } from "./chatHeader";
-import { MessageList } from "./messagelist"; 
+import { MessageList } from "./messagelist";
 import { ChatInput } from "./chatInput";
-import { socket } from "@/lib/socket"; 
+import { socket } from "@/lib/socket";
 
 // 🛑 TYPE DEFINITION
 export type Message = {
-  id?: string;       // Database ID
+  id?: string;
   text: string;
-  userId: string;    // Used to compare against 'myUserId'
-  userName?: string; 
+  userId: string;
+  userName?: string;
   createdAt: string;
+  user: {
+    userName: string;
+    photo: string | null;
+  };
 };
 
 export function ChatWindow() {
@@ -24,7 +28,7 @@ export function ChatWindow() {
   // --- STATE ---
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // 1. IDENTITY STATE: Stores the ID of the currently logged-in user
   const [myUserId, setMyUserId] = useState<string | null>(null);
 
@@ -43,7 +47,9 @@ export function ChatWindow() {
           setMyUserId(res.data.id);
         }
       } catch (error) {
-        console.error("❌ Failed to verify identity (User might be logged out)");
+        console.error(
+          "❌ Failed to verify identity (User might be logged out)"
+        );
         // Optional: Redirect to login here if strict auth is needed
       }
     };
@@ -56,10 +62,13 @@ export function ChatWindow() {
     if (!roomId) return;
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:4000/api/room/${roomId}/messages`, {
-        withCredentials: true,
-        params: { limit: 50 } 
-      });
+      const res = await axios.get(
+        `http://localhost:4000/api/room/${roomId}/messages`,
+        {
+          withCredentials: true,
+          params: { limit: 50 },
+        }
+      );
 
       if (res.data.success) {
         // Reverse needed if backend returns Newest->Oldest (we want Oldest->Newest)
@@ -86,7 +95,9 @@ export function ChatWindow() {
         // Deduplication: Prevent showing the same message twice
         // (Handles rare race conditions between REST fetch and Socket event)
         const exists = prev.some(
-            m => m.createdAt === newMessage.createdAt && m.userId === newMessage.userId
+          (m) =>
+            m.createdAt === newMessage.createdAt &&
+            m.userId === newMessage.userId
         );
         return exists ? prev : [...prev, newMessage];
       });
@@ -110,7 +121,7 @@ export function ChatWindow() {
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
 
-    // We do NOT send userId here. 
+    // We do NOT send userId here.
     // The backend extracts it securely from the socket cookie.
     socket.emit("send_message", {
       roomId,
@@ -127,10 +138,10 @@ export function ChatWindow() {
 
       {/* 2. MESSAGE LIST */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        <MessageList 
-            messages={messages} 
-            loading={loading} 
-            currentUserId={myUserId} // This prop controls the Right/Left alignment
+        <MessageList
+          messages={messages}
+          loading={loading}
+          currentUserId={myUserId} // This prop controls the Right/Left alignment
         />
       </div>
 

@@ -22,7 +22,6 @@ export function ChatSidebar() {
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [searchValue, setSearchValue] = useState("");
 
-
   // --- 1. FETCH ROOMS ---
   const fetchRooms = useCallback(async () => {
     try {
@@ -35,7 +34,7 @@ export function ChatSidebar() {
       // Connect to socket channels for all these rooms
       if (socket.connected) {
         fetchedRooms.forEach((room: Room) => {
-            socket.emit("join_room", room.id);
+          socket.emit("join_room", room.id);
         });
       }
     } catch (error) {
@@ -47,15 +46,12 @@ export function ChatSidebar() {
     fetchRooms();
   }, [fetchRooms]);
 
-
   useEffect(() => {
-  const filtered = rooms.filter(room =>
-    room.name.toLowerCase().includes(searchValue.toLowerCase())
-  );
-  setFilteredRooms(filtered);
-}, [searchValue, rooms]);
-
-
+    const filtered = rooms.filter((room) =>
+      room.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredRooms(filtered);
+  }, [searchValue, rooms]);
 
   // --- 2. LISTEN FOR LIVE UPDATES ---
   useEffect(() => {
@@ -87,7 +83,7 @@ export function ChatSidebar() {
 
     // Re-join rooms if we lose connection and reconnect
     socket.on("connect", () => {
-        rooms.forEach(r => socket.emit("join_room", r.id));
+      rooms.forEach((r) => socket.emit("join_room", r.id));
     });
 
     return () => {
@@ -119,7 +115,9 @@ export function ChatSidebar() {
           <Input
             placeholder="Chats search..."
             className="pl-10 py-5 bg-white border-gray-200 text-gray-600 focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xl"
-            onChange={(e)=>{setSearchValue(e.target.value)}}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+            }}
           />
         </div>
       </div>
