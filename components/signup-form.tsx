@@ -73,8 +73,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   return (
     <Card {...props}>
-      <div className="flex justify-center pt-2">
-        <img src="/logo.png" alt="logo" className="h-12 w-auto" />
+      <div className="flex justify-center pt-1">
+        <img src="/logo.png" alt="logo" className="h-10 w-auto" />
       </div>
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
@@ -90,7 +90,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           onUploadComplete={(url) => setPhotoUrl(url)}
         />
         <form onSubmit={handleSubmit}>
-          <FieldGroup className="space-y-4">
+          <FieldGroup className="space-y-1">
             <Field>
               <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input
@@ -132,18 +132,14 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-1">
                 {error}
               </p>
             )}
 
-            <FieldGroup className="pt-4 space-y-3">
-              <Button disabled={loading} type="submit">
+            <FieldGroup className="pt-1 space-y-1">
+              <Button disabled={loading} type="submit"  className=" border w-full bg-black text-white">
                 {loading ? "Creating account..." : "Create Account"}
-              </Button>
-
-              <Button variant="outline" type="button" disabled>
-                Sign up with Google
               </Button>
 
               <FieldDescription className="px-6 text-center">

@@ -55,6 +55,7 @@ export function RoomInfoDialog({
       axios
         .get(`http://localhost:4000/api/room/${roomId}`, {
           withCredentials: true,
+          
         })
         .then((res) => {
           setRoomDetails(res.data);
@@ -220,7 +221,7 @@ export function RoomInfoDialog({
             </div>
 
             <p className="text-sm text-gray-500 mt-1">
-              Group · {roomDetails._count?.members || 0} members
+              Group · {roomDetails._count?.members || 0} {roomDetails._count?.members>=2?"members":"member"}
             </p>
           </div>
 
@@ -287,14 +288,12 @@ export function RoomInfoDialog({
                 <div className="space-y-3">
                   {roomDetails.members?.map((member: any) => (
                     <div key={member.id} className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage
-                          src={`https://i.pravatar.cc/150?u=${member.id}`}
-                        />
-                        <AvatarFallback>
-                          {member.userName?.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Avatar className="h-10 w-10 border-4 border-white shadow-sm cursor-pointer">
+                          <AvatarImage src={thumbnailSrc} className="object-cover" />
+                          <AvatarFallback className="text-2xl bg-blue-100 text-blue-600">
+                            {roomDetails.name.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {member.userName || "Unknown User"}
