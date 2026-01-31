@@ -118,13 +118,11 @@ export function ChatHeader() {
           <div>
             <h2 className="text-sm font-bold text-gray-900">{room?.name}</h2>
             <p className="text-xs text-green-500 font-medium">
-              {/* Fixed plural logic safely */}
-              {room?._count?.members}{" "}
-              {room?._count?.members >= 1 ? "member" : "members"}
+               {/* Fixed plural logic safely */}
+              {room?._count?.members} {(room?._count?.members) >= 2 ? "member" : "members"}
             </p>
           </div>
         </div>
-
         <div className="flex items-center gap-1">
           {menuOpen && (
             <div

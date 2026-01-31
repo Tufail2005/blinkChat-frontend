@@ -5,12 +5,15 @@ import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SidebarCreateMenu } from "./SidebarCreateMenu";
 import axios from "axios";
-import { socket } from "@/lib/socket"; // 2. Import the shared socket
-import { SidebarItem, type Room } from "./SidebarItem"; // 3. Import the memoized item
 
-// Shape of the incoming socket data
+import { SidebarCreateMenu } from "./SidebarCreateMenu";
+import { SidebarItem, type Room } from "./SidebarItem";
+import { UserSidebarFooter } from "./UserSidebarFooter";
+
+// Socket
+import { socket } from "@/lib/socket";
+
 type NewMessagePayload = {
   roomId: string;
   text: string;
@@ -18,11 +21,26 @@ type NewMessagePayload = {
 };
 
 export function ChatSidebar() {
+  // --- STATE ---
   const [rooms, setRooms] = useState<Room[]>([]);
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  
+  // 👇 NEW STATE: Current User for the Footer
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // --- 1. FETCH ROOMS ---
+  // --- 1. FETCH USER (Fixes the Loading Footer) ---
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/api/auth/me", { withCredentials: true })
+      .then((res) => {
+        // console.log("User Fetched:", res.data);
+        setCurrentUser(res.data);
+      })
+      .catch((err) => console.error("Failed to fetch user profile", err));
+  }, []);
+
+  // --- 2. FETCH ROOMS ---
   const fetchRooms = useCallback(async () => {
     try {
       const res = await axios.get("http://localhost:4000/api/room/joined", {
@@ -31,7 +49,8 @@ export function ChatSidebar() {
       const fetchedRooms = res.data;
       setRooms(fetchedRooms);
       setFilteredRooms(fetchedRooms);
-      // Connect to socket channels for all these rooms
+
+      // Join socket channels
       if (socket.connected) {
         fetchedRooms.forEach((room: Room) => {
           socket.emit("join_room", room.id);
@@ -55,6 +74,7 @@ export function ChatSidebar() {
     };
   }, [fetchRooms]);
 
+  // --- 3. FILTER ROOMS ---
   useEffect(() => {
     const filtered = rooms.filter((room) =>
       room.name.toLowerCase().includes(searchValue.toLowerCase())
@@ -62,7 +82,7 @@ export function ChatSidebar() {
     setFilteredRooms(filtered);
   }, [searchValue, rooms]);
 
-  // --- 2. LISTEN FOR LIVE UPDATES ---
+  // --- 4. SOCKET LISTENERS ---
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
@@ -71,26 +91,19 @@ export function ChatSidebar() {
         const roomIndex = prevRooms.findIndex((r) => r.id === data.roomId);
         if (roomIndex === -1) return prevRooms;
 
-        // OPTIMIZATION TRICK:
-        // We reuse the OLD objects for rooms that didn't change.
-        // 'SidebarItem' sees the same object reference and SKIPS rendering them.
         const otherRooms = prevRooms.filter((r) => r.id !== data.roomId);
-
-        // We only create a NEW object for the room that actually updated.
         const updatedRoom = {
           ...prevRooms[roomIndex],
           lastMessage: data.text,
           lastMessageTime: data.createdAt,
         };
 
-        // Move updated room to the top
         return [updatedRoom, ...otherRooms];
       });
     };
 
     socket.on("receive_message", handleLiveMessage);
 
-    // Re-join rooms if we lose connection and reconnect
     socket.on("connect", () => {
       rooms.forEach((r) => socket.emit("join_room", r.id));
     });
@@ -103,7 +116,8 @@ export function ChatSidebar() {
 
   return (
     <div className="w-[320px] flex flex-col border-r bg-white h-full min-h-0">
-      {/* Header */}
+      
+      {/* HEADER */}
       <div className="flex-none p-5 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Chats</h1>
         <SidebarCreateMenu onRefresh={fetchRooms}>
@@ -117,31 +131,37 @@ export function ChatSidebar() {
         </SidebarCreateMenu>
       </div>
 
-      {/* Search */}
+      {/* SEARCH */}
       <div className="flex-none px-5 pb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Chats search..."
             className="pl-10 py-5 bg-white border-gray-200 text-gray-600 focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xl"
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-            }}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </div>
       </div>
 
-      {/* User List */}
+      {/* ROOM LIST (Scrollable) */}
       <div className="flex-1 min-h-0 overflow-hidden">
         <ScrollArea className="h-full">
           <div className="flex flex-col pb-2">
             {filteredRooms.map((room) => (
-              // KEY CHANGE: Use the optimized component
               <SidebarItem key={room.id} room={room} />
             ))}
           </div>
         </ScrollArea>
       </div>
+
+      {/* 👇 FOOTER (Fixed at Bottom) */}
+      <div className="flex-none">
+        <UserSidebarFooter 
+            user={currentUser} 
+            setUser={setCurrentUser} 
+        />
+      </div>
+
     </div>
   );
 }

@@ -60,6 +60,7 @@ export function RoomInfoDialog({
       axios
         .get(`http://localhost:4000/api/room/${roomId}`, {
           withCredentials: true,
+          
         })
         .then((res) => {
           setRoomDetails(res.data);
@@ -247,7 +248,7 @@ export function RoomInfoDialog({
             </div>
 
             <p className="text-sm text-gray-500 mt-1">
-              Group · {roomDetails._count?.members || 0} members
+              Group · {roomDetails._count?.members || 0} {roomDetails._count?.members>=2?"members":"member"}
             </p>
           </div>
 

@@ -22,7 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "emoji-picker-react": "^4.17.1",
-    "heic2any": "^0.0.4",
+    "imagekit": "^6.0.0",
     "imagekit-javascript": "^4.0.1",
     "imagekitio-next": "^1.0.1",
     "input-otp": "^1.4.2",
