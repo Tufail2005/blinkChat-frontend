@@ -44,6 +44,15 @@ export function ChatSidebar() {
 
   useEffect(() => {
     fetchRooms();
+    // LISTEN FOR THE UPDATE EVENT FROM THE DIALOG
+    const handleRoomUpdate = () => {
+      console.log("Room updated, refreshing sidebar...");
+      fetchRooms();
+    };
+    window.addEventListener("room_updated", handleRoomUpdate);
+    return () => {
+      window.removeEventListener("room_updated", handleRoomUpdate);
+    };
   }, [fetchRooms]);
 
   useEffect(() => {

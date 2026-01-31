@@ -26,6 +26,7 @@ type NearbyRoom = {
   name: string;
   description?: string;
   membersCount: number;
+  photo?: string | null;
 };
 
 export function NearbyRoomDialog({
@@ -156,11 +157,16 @@ export function NearbyRoomDialog({
                     >
                       {/* Left: Info */}
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 border">
+                        <Avatar className="h-12 w-12 border border-gray-200">
                           <AvatarImage
-                            src={`https://i.pravatar.cc/150?u=${room.id}`}
+                            src={
+                              room.photo
+                                ? `${room.photo}?tr=w-100,h-100,fo-auto`
+                                : undefined
+                            }
+                            className="object-cover"
                           />
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-blue-100 text-blue-600 font-bold">
                             {room.name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>

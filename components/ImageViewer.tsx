@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 interface ImageViewerProps {
   isOpen: boolean;
   onClose: () => void;
-  imageUrl?: string | null; // The high-res URL
+  imageUrl?: string | null;
   altName: string; // Name to show if image fails or for caption
 }
 

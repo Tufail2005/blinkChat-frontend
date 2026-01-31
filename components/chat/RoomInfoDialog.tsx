@@ -24,17 +24,22 @@ interface RoomInfoDialogProps {
   roomId: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onRoomUpdate?: () => void;
 }
 
 export function RoomInfoDialog({
   roomId,
   isOpen,
   onOpenChange,
+  onRoomUpdate,
 }: RoomInfoDialogProps) {
   const [roomDetails, setRoomDetails] = useState<any>(null);
 
   // State for Full Image View
-  const [isViewImageOpen, setIsViewImageOpen] = useState(false);
+  const [viewerData, setViewerData] = useState<{
+    url: string | null;
+    name: string;
+  } | null>(null);
 
   // State for Editing
   const [isEditingName, setIsEditingName] = useState(false);
@@ -49,7 +54,7 @@ export function RoomInfoDialog({
   const uploadHandlerRef = useRef<UploadHandlerRef>(null);
   const router = useRouter();
 
-  // 1. Fetch Full Details when Dialog Opens
+  // Fetch Full Details when Dialog Opens
   useEffect(() => {
     if (isOpen && roomId) {
       axios
@@ -65,7 +70,20 @@ export function RoomInfoDialog({
     }
   }, [isOpen, roomId]);
 
-  // 2. Generic Update Function (Handles both Name and Description)
+  // --- HELPER TO TRIGGER UPDATES EVERYWHERE ---
+  const triggerRefresh = () => {
+    //Tell ChatHeader to refresh
+    if (onRoomUpdate) onRoomUpdate();
+
+    //Tell Sidebar to refresh (via Custom Event)
+    // dispatch an event that ChatSidebar will listen for
+    window.dispatchEvent(new Event("room_updated"));
+
+    //Refresh Next.js Server Components
+    router.refresh();
+  };
+
+  // Generic Update Function (Handles both Name and Description)
   const handleUpdateRoom = async (field: "name" | "description") => {
     const value = field === "name" ? newName : newDescription;
 
@@ -85,6 +103,8 @@ export function RoomInfoDialog({
 
       if (field === "name") setIsEditingName(false);
       if (field === "description") setIsEditingDesc(false);
+
+      triggerRefresh();
     } catch (error: any) {
       console.error(`Failed to update ${field}:`, error);
       if (error.response) {
@@ -125,6 +145,8 @@ export function RoomInfoDialog({
       );
       setRoomDetails((prev: any) => ({ ...prev, photo: url }));
       setIsUploading(false);
+
+      triggerRefresh();
     } catch (error) {
       console.error("Failed to update room photo", error);
       setIsUploading(false);
@@ -151,7 +173,12 @@ export function RoomInfoDialog({
             <div className="relative">
               {/* 1. The Avatar Image (Clicks to VIEW) */}
               <div
-                onClick={() => setIsViewImageOpen(true)}
+                onClick={() =>
+                  setViewerData({
+                    url: roomDetails.photo,
+                    name: roomDetails.name,
+                  })
+                }
                 className="cursor-pointer transition-transform hover:scale-105"
               >
                 <Avatar className="h-28 w-28 border-4 border-white shadow-sm cursor-pointer">
@@ -224,7 +251,7 @@ export function RoomInfoDialog({
             </p>
           </div>
 
-          <ScrollArea className="max-h-[400px]">
+          <ScrollArea className="max-h-100">
             <div className="p-6 space-y-6">
               {/* --- DESCRIPTION SECTION --- */}
               <div className="space-y-3">
@@ -283,25 +310,44 @@ export function RoomInfoDialog({
                   <Users className="h-4 w-4" />
                   <span>{roomDetails.members?.length} Members</span>
                 </div>
-
                 <div className="space-y-3">
-                  {roomDetails.members?.map((member: any) => (
-                    <div key={member.id} className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage
-                          src={`https://i.pravatar.cc/150?u=${member.id}`}
-                        />
-                        <AvatarFallback>
-                          {member.userName?.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {member.userName || "Unknown User"}
-                        </p>
+                  {roomDetails.members?.map((member: any) => {
+                    const memberPhoto = member.photo
+                      ? `${member.photo}?tr=w-100,h-100,fo-auto,r-max`
+                      : undefined;
+
+                    const memberInitials = member.userName
+                      ? member.userName.slice(0, 2).toUpperCase()
+                      : "??";
+                    return (
+                      <div key={member.id} className="flex items-center gap-3">
+                        <div
+                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() =>
+                            setViewerData({
+                              url: member.photo,
+                              name: member.userName,
+                            })
+                          }
+                        >
+                          <Avatar className="h-9 w-9 border border-gray-200">
+                            <AvatarImage
+                              src={memberPhoto}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-gray-100 text-gray-600 text-xs font-bold">
+                              {memberInitials}
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {member.userName || "Unknown User"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -323,10 +369,10 @@ export function RoomInfoDialog({
 
       {/* --- FULL SCREEN IMAGE VIEWER --- */}
       <ImageViewer
-        isOpen={isViewImageOpen}
-        onClose={() => setIsViewImageOpen(false)}
-        imageUrl={roomDetails.photo}
-        altName={roomDetails.name}
+        isOpen={!!viewerData}
+        onClose={() => setViewerData(null)}
+        imageUrl={viewerData?.url}
+        altName={viewerData?.name || "Image"}
       />
 
       {/* --- INVISIBLE UPLOAD HANDLER --- */}

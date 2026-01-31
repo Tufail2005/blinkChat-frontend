@@ -67,9 +67,8 @@ export function MessageList({
     );
   }
 
-  console.log("FIRST MESSAGE DATA:", messages[0]);
   return (
-    <div>
+    <>
       <ScrollArea className="h-full w-full">
         <div className="flex flex-col gap-4 px-4 py-4 pb-4">
           {messages.map((msg, index) => {
@@ -158,9 +157,9 @@ export function MessageList({
                       minute: "2-digit",
                     })}
                   </span>
-                  {isMe && (
+                  {/* {isMe && (
                     <CheckCheck className="h-3.5 w-3.5 text-green-500" />
-                  )}
+                  )} */}
                 </div>
               </div>
             );
@@ -176,6 +175,6 @@ export function MessageList({
         imageUrl={viewerData?.url}
         altName={viewerData?.name || ""}
       />
-    </div>
+    </>
   );
 }

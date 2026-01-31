@@ -43,7 +43,6 @@ export function ChatWindow() {
         });
 
         if (res.data?.id) {
-          console.log("✅ Identity Verified:", res.data.id);
           setMyUserId(res.data.id);
         }
       } catch (error) {
