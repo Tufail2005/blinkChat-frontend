@@ -14,6 +14,9 @@ interface AvatarUploadProps {
   defaultImage?: string;
 }
 
+
+
+
 export default function AvatarUpload({
   onUploadComplete,
   folderPath,
@@ -26,6 +29,7 @@ export default function AvatarUpload({
   // Cropper State
   const [cropOpen, setCropOpen] = useState(false);
   const [selectedImgSrc, setSelectedImgSrc] = useState<string | null>(null);
+  const base_url = process.env.NEXT_PUBLIC_API_URL;
 
   // Handle Selection -> Open Cropper
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +65,7 @@ export default function AvatarUpload({
 
       // Upload Logic
       const authRes = await axios.get(
-        "http://localhost:4000/api/auth/imagekit"
+        `${base_url}/api/auth/imagekit`
       );
       const { signature, token, expire } = authRes.data;
 

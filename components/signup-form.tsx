@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import AvatarUpload from "@/components/AvatarUpload";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const base_url = process.env.NEXT_PUBLIC_API_URL;
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,7 +51,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
     try {
       await axios.post(
-        "http://localhost:4000/api/auth/register",
+        `${base_url}/api/auth/register`,
         {
           userName,
           password,

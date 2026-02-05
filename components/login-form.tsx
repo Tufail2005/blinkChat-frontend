@@ -24,6 +24,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const base_url = process.env.NEXT_PUBLIC_API_URL;
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setemail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +42,7 @@ export function LoginForm({
     setError("");
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/forgot-password",
+        `${base_url}/api/auth/forgot-password`,
         { email }
       );
 
@@ -64,7 +65,7 @@ export function LoginForm({
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/login",
+        `${base_url}/api/auth/login`,
         {
           identifier: username,
           password,

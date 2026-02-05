@@ -28,6 +28,7 @@ export function EmailForm({ className, onSuccess, ...props }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const base_url = process.env.NEXT_PUBLIC_API_URL;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,7 +36,7 @@ export function EmailForm({ className, onSuccess, ...props }: EmailFormProps) {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:4000/api/auth/send-otp", { email });
+      await axios.post(`${base_url}/api/auth/send-otp`, { email });
 
       onSuccess(email);
     } catch (err) {

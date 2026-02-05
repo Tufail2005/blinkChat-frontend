@@ -119,7 +119,7 @@ export function ChatSidebar() {
     <div className="w-[320px] flex flex-col border-r bg-white h-full min-h-0">
       {/* HEADER */}
       <div className="flex-none p-5 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Chats</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Rooms</h1>
         <SidebarCreateMenu onRefresh={fetchRooms}>
           <Button
             variant="outline"
