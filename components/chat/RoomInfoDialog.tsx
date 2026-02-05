@@ -46,7 +46,7 @@ export function RoomInfoDialog({
   const [newName, setNewName] = useState("");
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [newDescription, setNewDescription] = useState("");
-
+  const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
   // State for Uploading
   const [isUploading, setIsUploading] = useState(false);
 
@@ -58,9 +58,8 @@ export function RoomInfoDialog({
   useEffect(() => {
     if (isOpen && roomId) {
       axios
-        .get(`http://localhost:4000/api/room/${roomId}`, {
+        .get(`${base_url}/api/room/${roomId}`, {
           withCredentials: true,
-          
         })
         .then((res) => {
           setRoomDetails(res.data);
@@ -93,11 +92,9 @@ export function RoomInfoDialog({
     try {
       const payload = { [field]: value };
 
-      await axios.put(
-        `http://localhost:4000/api/room/${roomId}/update`,
-        payload,
-        { withCredentials: true }
-      );
+      await axios.put(`${base_url}/api/room/${roomId}/update`, payload, {
+        withCredentials: true,
+      });
 
       // Optimistic Update
       setRoomDetails((prev: any) => ({ ...prev, [field]: value }));
@@ -120,7 +117,7 @@ export function RoomInfoDialog({
 
     try {
       await axios.post(
-        `http://localhost:4000/api/room/${roomId}/leave`,
+        `${base_url}/api/room/${roomId}/leave`,
         {},
         { withCredentials: true }
       );
@@ -140,7 +137,7 @@ export function RoomInfoDialog({
   const onUploadSuccess = async (url: string) => {
     try {
       await axios.put(
-        `http://localhost:4000/api/room/${roomId}/update`,
+        `${base_url}/api/room/${roomId}/update`,
         { photo: url },
         { withCredentials: true }
       );
@@ -248,7 +245,8 @@ export function RoomInfoDialog({
             </div>
 
             <p className="text-sm text-gray-500 mt-1">
-              Group · {roomDetails._count?.members || 0} {roomDetails._count?.members>=2?"members":"member"}
+              Group · {roomDetails._count?.members || 0}{" "}
+              {roomDetails._count?.members >= 2 ? "members" : "member"}
             </p>
           </div>
 

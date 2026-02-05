@@ -22,6 +22,7 @@ export type Message = {
 };
 
 export function ChatWindow() {
+  const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
   const params = useParams();
   const roomId = params.roomId as string;
 
@@ -38,7 +39,7 @@ export function ChatWindow() {
       try {
         // We ask the backend "Who am I?"
         // 'withCredentials: true' sends the auth_token cookie automatically
-        const res = await axios.get("http://localhost:4000/api/auth/me", {
+        const res = await axios.get(`${base_url}/api/auth/me`, {
           withCredentials: true,
         });
 
@@ -61,13 +62,10 @@ export function ChatWindow() {
     if (!roomId) return;
     try {
       setLoading(true);
-      const res = await axios.get(
-        `http://localhost:4000/api/room/${roomId}/messages`,
-        {
-          withCredentials: true,
-          params: { limit: 50 },
-        }
-      );
+      const res = await axios.get(`${base_url}/api/room/${roomId}/messages`, {
+        withCredentials: true,
+        params: { limit: 50 },
+      });
 
       if (res.data.success) {
         // Reverse needed if backend returns Newest->Oldest (we want Oldest->Newest)

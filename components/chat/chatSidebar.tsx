@@ -21,18 +21,19 @@ type NewMessagePayload = {
 };
 
 export function ChatSidebar() {
+  const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
   // --- STATE ---
   const [rooms, setRooms] = useState<Room[]>([]);
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [searchValue, setSearchValue] = useState("");
-  
+
   // 👇 NEW STATE: Current User for the Footer
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   // --- 1. FETCH USER (Fixes the Loading Footer) ---
   useEffect(() => {
     axios
-      .get("http://localhost:4000/api/auth/me", { withCredentials: true })
+      .get(`${base_url}/api/auth/me`, { withCredentials: true })
       .then((res) => {
         // console.log("User Fetched:", res.data);
         setCurrentUser(res.data);
@@ -43,7 +44,7 @@ export function ChatSidebar() {
   // --- 2. FETCH ROOMS ---
   const fetchRooms = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/room/joined", {
+      const res = await axios.get(`${base_url}/api/room/joined`, {
         withCredentials: true,
       });
       const fetchedRooms = res.data;
@@ -115,8 +116,7 @@ export function ChatSidebar() {
   }, [rooms]);
 
   return (
-    <div className="w-full md:w-[320px] flex flex-col md:border-r bg-white h-full min-h-0">
-      
+    <div className="w-[320px] flex flex-col border-r bg-white h-full min-h-0">
       {/* HEADER */}
       <div className="flex-none p-5 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Rooms</h1>
@@ -156,12 +156,8 @@ export function ChatSidebar() {
 
       {/* 👇 FOOTER (Fixed at Bottom) */}
       <div className="flex-none">
-        <UserSidebarFooter 
-            user={currentUser} 
-            setUser={setCurrentUser} 
-        />
+        <UserSidebarFooter user={currentUser} setUser={setCurrentUser} />
       </div>
-
     </div>
   );
 }

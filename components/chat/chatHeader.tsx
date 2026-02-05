@@ -43,7 +43,8 @@ export function ChatHeader() {
 
     try {
       // setLoading(true);
-      const res = await axios.get(`http://localhost:4000/api/room/${roomId}`, {
+      const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
+      const res = await axios.get(`${base_url}/api/room/${roomId}`, {
         withCredentials: true,
       });
       setRoom(res.data);
@@ -118,8 +119,9 @@ export function ChatHeader() {
           <div>
             <h2 className="text-sm font-bold text-gray-900">{room?.name}</h2>
             <p className="text-xs text-green-500 font-medium">
-               {/* Fixed plural logic safely */}
-              {room?._count?.members} {(room?._count?.members) >= 2 ? "member" : "members"}
+              {/* Fixed plural logic safely */}
+              {room?._count?.members}{" "}
+              {room?._count?.members >= 2 ? "member" : "members"}
             </p>
           </div>
         </div>

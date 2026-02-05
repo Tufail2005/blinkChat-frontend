@@ -43,6 +43,7 @@ export function NearbyRoomDialog({
   const [rooms, setRooms] = useState<NearbyRoom[]>([]);
   const [searching, setSearching] = useState(false);
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
 
   useEffect(() => {
     if (location) {
@@ -54,7 +55,7 @@ export function NearbyRoomDialog({
     setSearching(true);
     try {
       const res = await axios.get(
-        `http://localhost:4000/api/room/nearby?latitude=${latitude}&longitude=${longitude}`,
+        `${base_url}/api/room/nearby?latitude=${latitude}&longitude=${longitude}`,
         { withCredentials: true }
       );
       setRooms(res.data.rooms);
@@ -69,7 +70,7 @@ export function NearbyRoomDialog({
     try {
       setJoiningId(roomId);
       await axios.post(
-        "http://localhost:4000/api/room/join",
+        `${base_url}/api/room/join`,
         {},
         { params: { roomId }, withCredentials: true }
       );

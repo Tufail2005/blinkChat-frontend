@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { type Message } from "./chatWindow";
