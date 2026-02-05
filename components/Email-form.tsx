@@ -36,7 +36,7 @@ export function EmailForm({ className, onSuccess, ...props }: EmailFormProps) {
     setLoading(true);
 
     try {
-      await axios.post(`${base_url}/api/auth/send-otp`, { email });
+      await axios.post(`${base_url}/api/auth/send-otp`, { email },{ withCredentials: true });
 
       onSuccess(email);
     } catch (err) {
