@@ -8,7 +8,7 @@ export default function MessageHome() {
         <div className="flex h-screen w-full p-0 md:p-4 overflow-hidden bg-gray-100 md:bg-transparent">
         <div className="flex h-full md:h-[calc(100vh-2rem)] w-full bg-white md:shadow-xl overflow-hidden md:rounded-xl">
 
-            <div className="w-full md:w-auto h-full flex flex-col md:border-r">
+            <div className="w-full border-r-0 lg:border-r xl:w-auto h-full flex flex-col ">
             <ChatSidebar />
             </div>
 

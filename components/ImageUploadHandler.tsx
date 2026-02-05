@@ -32,6 +32,7 @@ export const ImageUploadHandler = forwardRef<
     // --- CROPPER STATE ---
     const [cropOpen, setCropOpen] = useState(false);
     const [selectedImgSrc, setSelectedImgSrc] = useState<string | null>(null);
+    const base_url = process.env.NEXT_PUBLIC_API_URL;
 
     useImperativeHandle(ref, () => ({
       open: () => inputRef.current?.click(),
@@ -85,7 +86,7 @@ export const ImageUploadHandler = forwardRef<
 
         // AUTH & UPLOAD
         const authRes = await axios.get(
-          "http://localhost:4000/api/auth/imagekit"
+          `${base_url}/auth/imagekit`
         );
         const { signature, token, expire } = authRes.data;
 

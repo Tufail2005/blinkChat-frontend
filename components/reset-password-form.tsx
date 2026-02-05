@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
     className,
     ...props
     }: React.ComponentProps<"div">) {
+        const base_url = process.env.NEXT_PUBLIC_API_URL;
         const [password, setPassword] = useState("");
         const [confirmPassword, setConfirmPassword] = useState("");
         const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +53,7 @@ import { Input } from "@/components/ui/input";
             setIsLoading(true);
             
             try {
-                await axios.post("http://localhost:4000/api/auth/reset-password", {
+                await axios.post(`${base_url}/api/auth/reset-password`, {
                     token: token,         
                     newPassword: password 
                 });
