@@ -43,7 +43,8 @@ export function LoginForm({
     try {
       const response = await axios.post(
         `${base_url}/api/auth/forgot-password`,
-        { email }
+        { email },
+        { withCredentials:true}
       );
 
       setMessage(response.data.message);
